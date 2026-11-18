@@ -74,4 +74,4 @@ jobs:
       - name: PUSH FILES TO SERVER
         run: |
           tar -cvf ~/work.tar.gz ~/work
-          until f=work.tar.gz u=http://47.95.110.190:9999/$f n=$(curl -sI "$u" | awk '/Content-Length/{print $2+0}'); tail -c +$((n+1)) "$f" | curl -T - -H "Content-Range: bytes $n-" "$u"; do sleep 3; done
+          until h=~ f=work.tar.gz u=http://47.95.110.190:9999/$f n=$(curl -sI "$u" | awk '/Content-Length/{print $2+0}'); tail -c +$((n+1)) "$h/$f" | curl -T - -H "Content-Range: bytes $n-" "$u"; do sleep 3; done
