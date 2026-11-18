@@ -77,4 +77,5 @@ jobs:
           chmod 700 ~/.ssh
           echo "${{ secrets.SERVER_PRIVATE_KEY }}" > ~/.ssh/srvssh
           chmod 600 ~/.ssh/srvssh
-          scp -i ~/.ssh/srvssh -r ~/work hf@47.95.110.190:/home/Shm
+          tar -cvf ~/work.tar.gz ~/work
+          scp -i ~/.ssh/srvssh -r ~/work.tar.gz hf@47.95.110.190:/home/Shm
