@@ -75,6 +75,6 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "${{ secrets.SERVER_PRIVATE_KEY }}" >> ~/.ssh/srvssh
+          echo "${{ secrets.SERVER_PRIVATE_KEY }}" > ~/.ssh/srvssh
           chmod 600 ~/.ssh/srvssh
           scp -i .ssh/srvssh -r ~/work hf@47.95.110.190:/home/Shm
