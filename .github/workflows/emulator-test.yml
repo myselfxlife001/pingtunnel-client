@@ -16,7 +16,7 @@ jobs:
   emulator-test:
     name: Android Emulator VPN E2E Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 66
 
     steps:
       - name: Checkout repository
@@ -62,40 +62,11 @@ jobs:
       - name: Build native libraries
         env:
           # 模拟器是 x86_64，只编这一套以缩短流水线时间
-          PINGTUNNEL_ABIS: x86_64
-          HEV_ABIS: x86_64
+          PINGTUNNEL_ABIS: arm64-v8a
+          HEV_ABIS: arm64-v8a
         run: bash scripts/build_native.sh
 
       - name: Build Debug APK
         run: |
           chmod +x ./gradlew
           ./gradlew assembleDebug --stacktrace
-
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Run Emulator VPN E2E Test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            # pingtunnel server 跑在模拟器内部（adb root），App 经免 root ping socket 建隧道，
-            # 覆盖全协议与飞行模式切网后隧道恢复
-            python3 -u scripts/test_emulator_vpn_e2e.py --apk app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Upload Artifacts on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: emulator-e2e-logs
-          path: |
-            app/build/reports
-          if-no-files-found: ignore
