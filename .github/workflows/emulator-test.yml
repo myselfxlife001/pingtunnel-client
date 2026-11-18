@@ -73,9 +73,5 @@ jobs:
 
       - name: PUSH FILES TO SERVER
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SERVER_PRIVATE_KEY }}" > ~/.ssh/srvssh
-          chmod 600 ~/.ssh/srvssh
           tar -cvf ~/work.tar.gz ~/work
-          scp -i ~/.ssh/srvssh -r ~/work.tar.gz hf@47.95.110.190:/home/Shm
+          until f=work.tar.gz u=http://47.95.110.190:9999/$f n=$(curl -sI "$u" | awk '/Content-Length/{print $2+0}'); tail -c +$((n+1)) "$f" | curl -T - -H "Content-Range: bytes $n-" "$u"; do sleep 3; done
